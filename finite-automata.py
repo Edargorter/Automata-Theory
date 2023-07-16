@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-# Author: Zachary Bowditch (Edargorter), 2023 
-# Demonstration of a python implementation of an arbitrary (deterministic) finite state machine using a class structure 
+# Author: Zachary Bowditch (Edargorter)
+# Year: 2023
+# Description: Demonstration of a python implementation of an arbitrary (deterministic) finite automaton using a class objects 
 
 import string
 import random 
@@ -25,7 +26,7 @@ class State:
     def __str__(self):
         return "\n".join([f"({self.label}, {s}) -> {self.transitions[s]}" for s in self.transitions])
 
-class FSM:
+class FA:
 
     def __init__(self, states: dict(), alphabet: list, start: str, accepts: list):
         self.alphabet = alphabet
@@ -45,7 +46,7 @@ class FSM:
 def getRandomString(alphabet: list, length: int):
     return ''.join([random.choice(alphabet) for i in range(length)])
 
-def getRandomFSM(alphabet_limit: int, state_limit: int, accepts_limit: int) -> FSM:
+def getRandomFA(alphabet_limit: int, state_limit: int, accepts_limit: int) -> FA:
     assert accepts_limit <= state_limit
     universal_alphabet = string.digits + string.ascii_lowercase 
     alphabet_limit = min(alphabet_limit, len(universal_alphabet))
@@ -63,16 +64,16 @@ def getRandomFSM(alphabet_limit: int, state_limit: int, accepts_limit: int) -> F
         state = State(sl, transitions)
         states[sl] = state 
     accepts = random.sample(state_labels, accepts_limit)
-    return alphabet, FSM(states, alphabet, state_labels[0], accepts)
+    return alphabet, FA(states, alphabet, state_labels[0], accepts)
 
 if __name__ == "__main__":
-    # All strings that end in 1 
+    # FA accepting only strings that end in 1 
     q1 = State("q1", {"0": "q1", "1": "q2"})
     q2 = State("q2", {"0": "q1", "1": "q2"})
     states = {q1.getLabel(): q1, q2.getLabel(): q2}
     start = q1.getLabel()
     accepts = [q2.getLabel()]
-    fsm = FSM(states, "01", start, accepts)
+    fsm = FA(states, "01", start, accepts)
     print(fsm)
     no_1 = "10110101010101010100000000000"
     yes_1 = "100000000000000000000000001"
@@ -81,14 +82,16 @@ if __name__ == "__main__":
     print(yes_1, " : ", fsm.doesAccept(yes_1))
     print(yes_2, " : ", fsm.doesAccept(yes_2))
 
+    # Some empirical experimentation 
+
     total = 100000
     len_limit = 100
     accept = 0
 
     for i in range(total):
-        alphabet, fsm = getRandomFSM(alphabet_limit = 3, state_limit = 8, accepts_limit = 3) # 82% accept
-        # alphabet, fsm = getRandomFSM(alphabet_limit = 10, state_limit = 10, accepts_limit = 2) # 48% accept 
-        # alphabet, fsm = getRandomFSM(alphabet_limit = 10, state_limit = 10, accepts_limit = 1) # 29% accept 
+        alphabet, fsm = getRandomFA(alphabet_limit = 3, state_limit = 8, accepts_limit = 3) # 82% accept
+        # alphabet, fsm = getRandomFA(alphabet_limit = 10, state_limit = 10, accepts_limit = 2) # 48% accept 
+        # alphabet, fsm = getRandomFA(alphabet_limit = 10, state_limit = 10, accepts_limit = 1) # 29% accept 
         rstring = getRandomString(alphabet, random.randint(1, len_limit))
         yes = fsm.doesAccept(rstring)
         accept += yes 
@@ -98,4 +101,4 @@ if __name__ == "__main__":
         print(yes)
         '''
 
-    print(accept / total)
+    print(f"Accept rate: {100 * accept / total} %")
