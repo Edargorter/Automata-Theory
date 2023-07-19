@@ -20,6 +20,7 @@
 import string
 import random 
 import time 
+from sys import argv 
 
 class State:
 
@@ -53,6 +54,9 @@ class FSM:
             curr = self.states[curr.transition(c)]
         return curr.getLabel() in self.accepts
 
+    def getAlphabet(self):
+        return self.alphabet
+
     def __str__(self):
         return "{}\n{}\n{}\n{}\n{}".format(", ".join([s for s in self.states]), ', '.join([c for c in self.alphabet]), self.start, ", ".join([a for a in self.accepts]), "\n".join([self.states[s].to_string() for s in self.states]))
 
@@ -63,10 +67,12 @@ class FSM:
         '''
             
 def getRandomString(alphabet: list, length: int):
+    random.seed()
     return ''.join([random.choice(alphabet) for i in range(length)])
 
 def getRandomFSM(alphabet_limit: int, state_limit: int, accepts_limit: int) -> FSM:
     assert accepts_limit <= state_limit
+    random.seed()
     universal_alphabet = string.digits + string.ascii_lowercase 
     alphabet_limit = min(alphabet_limit, len(universal_alphabet))
     alphabet_limit = random.randint(1, alphabet_limit)
@@ -120,6 +126,7 @@ def readFSMs(filename):
     return fsms
 
 if __name__ == "__main__":
+    '''
     # FSM accepting only strings that end in 1 
     q1 = State("q1", {"0": "q1", "1": "q2"})
     q2 = State("q2", {"0": "q1", "1": "q2"})
@@ -138,15 +145,33 @@ if __name__ == "__main__":
     print(yes_1, " : ", fsm.doesAccept(yes_1))
     print(yes_2, " : ", fsm.doesAccept(yes_2))
 
-    fsms = readFSMs("test_cases.txt")
+    total = 10000
+    for i in range(total):
+        alphabet, fsm = getRandomFSM(alphabet_limit = 10, state_limit = 30, accepts_limit = 2)
+        print(fsm)
+        print()
 
-    print(fsms[3])
-    print(fsms[1].doesAccept(no_1))
-    print(fsms[2].doesAccept(yes_1))
-    print(fsms[3].doesAccept(yes_2))
-    print(fsms[4].doesAccept(maybe))
     exit(1)
 
+    fsms = readFSMs("test_cases.txt")
+    for f in fsms:
+        rstring = getRandomString(f.getAlphabet(), 1000)
+        print("{} {}".format(f.doesAccept(rstring), rstring))
+    '''
+
+    fsms = readFSMs("test_cases.txt")
+    index = 0
+    accept = 0
+    for line in [line.strip() for line in open("test_strings.txt", 'r').readlines()]:
+        result, s = line.split(" ")
+        test = fsms[index].doesAccept(s)
+        assert test == eval(result) # Does our evaluation match the one for that string in the file?
+        index += 1
+        accept += test
+
+    print(f"{accept} out of {index} accept")
+
+    '''
     # Some empirical experimentation 
 
     total = 100000
@@ -160,10 +185,9 @@ if __name__ == "__main__":
         rstring = getRandomString(alphabet, random.randint(1, len_limit))
         yes = fsm.doesAccept(rstring)
         accept += yes 
-        '''
         print(fsm)
         print(rstring)
         print(yes)
-        '''
 
     print(f"Accept rate: {100 * accept / total} %")
+    '''
