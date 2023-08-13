@@ -70,3 +70,8 @@ real    0m1.974s
 user    0m1.889s
 sys     0m0.084s
 ```
+
+## TODO
+
+- Dynamic creation of FSM sprite diagram with animation for string parsing
+- Other computational models, pushdown automata, turing machines etc.
