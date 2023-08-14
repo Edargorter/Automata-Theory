@@ -73,5 +73,6 @@ sys     0m0.084s
 
 ## TODO
 
-- Dynamic creation of FSM sprite diagram with animation for string parsing
+- Dynamic creation of FSM sprite diagram with animation for string parsing (pygame?)
 - Other computational models, pushdown automata, turing machines etc.
+- Other designs, compare performance with benchmark regex engines 
